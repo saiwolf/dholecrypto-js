@@ -1,6 +1,6 @@
 const assert = require('assert');
 const expect = require('chai').expect;
-const Util = require('../lib/Util');
+const Util = require('../dist/lib/Util');
 const hex = require('rfc4648').base16;
 
 describe('Util', function () {

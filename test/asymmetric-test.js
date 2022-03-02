@@ -1,11 +1,11 @@
 const assert = require('assert');
 const expect = require('chai').expect;
-const Asymmetric = require('../lib/Asymmetric');
-const AsymmetricSecretKey = require('../lib/key/AsymmetricSecretKey');
-const AsymmetricPublicKey = require('../lib/key/AsymmetricPublicKey');
-const SymmetricKey = require('../lib/key/SymmetricKey');
+const Asymmetric = require('../dist/lib/Asymmetric');
+const AsymmetricSecretKey = require('../dist/lib/key/AsymmetricSecretKey');
+const AsymmetricPublicKey = require('../dist/lib/key/AsymmetricPublicKey');
+const SymmetricKey = require('../dist/lib/key/SymmetricKey').default;
 
-const Util = require('../lib/Util');
+const Util = require('../dist/lib/Util');
 const base64url = require('rfc4648').base64url;
 const hex = require('rfc4648').base16;
 const loadJsonFile = require('load-json-file');

@@ -1,39 +1,42 @@
 "use strict";
 
 const base64url = require('rfc4648').base64url;
-const Util = require('./Util');
-const CryptoError = require('./error/CryptoError');
-const SymmetricKey = require('./key/SymmetricKey');
-const Symmetric = require('./Symmetric');
-const { SodiumPlus } = require('sodium-plus');
-let sodium;
+import Util from './Util';
+import CryptoError from './error/CryptoError';
+const SymmetricKey = require('./key/SymmetricKey').default;
+import Symmetric from './Symmetric';
+import { SodiumPlus } from 'sodium-plus';
+let sodium: SodiumPlus;
+
+export type PasswordOptions = {
+    alg: string;
+    mem: number;
+    ops: number;
+}
+
+const defaultOptions: PasswordOptions = {
+    alg: 'argon2id',
+    mem: 1 << 26,
+    ops: 2,
+}
 
 /**
  * @name Symmetric
  * @package dholecrypto
  */
-module.exports = class Password {
+export default class Password {
+    symmetricKey: typeof SymmetricKey;
+    options: PasswordOptions;
     /**
      * @param {SymmetricKey} symmetricKey
      * @param {object} options
      */
-    constructor(symmetricKey, options = null) {
+    constructor(symmetricKey: typeof SymmetricKey, options: PasswordOptions = defaultOptions) {
         if (!(symmetricKey instanceof SymmetricKey)) {
             throw new TypeError("Argument 1 must be an instance of SymmetricKey");
         }
         this.symmetricKey = symmetricKey;
-        let defaultOpts = {
-            "alg": "argon2id",
-            "mem": 1 << 26,
-            "ops": 2
-        };
-        this.options = defaultOpts;
-        if (typeof options === 'object') {
-            if (options !== null) {
-                this.options['mem'] = options.mem || defaultOpts.mem;
-                this.options['ops'] = options.ops || defaultOpts.ops;
-            }
-        }
+        this.options = options;
     }
 
     /**
@@ -41,7 +44,7 @@ module.exports = class Password {
      * @param {string|Buffer} ad
      * @return {string}
      */
-    async hash(password, ad = '') {
+    async hash(password: string | Buffer, ad: string | Buffer = ''): Promise<string> {
         if (!sodium) sodium = await SodiumPlus.auto();
         let pwhash = await sodium.crypto_pwhash_str(
             password,
@@ -59,7 +62,7 @@ module.exports = class Password {
      * @param {string|Buffer} ad
      * @return {boolean}
      */
-    async needsRehash(pwhash, ad = '') {
+    async needsRehash(pwhash: string | Buffer, ad: string | Buffer = ''): Promise<boolean> {
         if (!sodium) sodium = await SodiumPlus.auto();
         let decrypted;
         let encoded = `m=${this.options.mem >> 10},t=${this.options.ops},p=1`;
@@ -95,7 +98,7 @@ module.exports = class Password {
      * @param {string|Buffer} ad
      * @return {boolean}
      */
-    async verify(password, pwhash, ad = '') {
+    async verify(password: string | Buffer, pwhash: string | Buffer, ad: string | Buffer = ''): Promise<boolean> {
         if (!sodium) sodium = await SodiumPlus.auto();
         let decrypted;
         if (ad.length > 0) {

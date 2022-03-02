@@ -1,22 +1,26 @@
 "use strict";
 
-const { SodiumPlus, Ed25519SecretKey, X25519SecretKey } = require('sodium-plus');
-const AsymmetricPublicKey = require('./AsymmetricPublicKey');
-const Util = require('../Util');
-let sodium;
+import { SodiumPlus, Ed25519SecretKey, X25519SecretKey, CryptographyKey } from 'sodium-plus';
+import AsymmetricPublicKey from './AsymmetricPublicKey';
+import Util from '../Util';
+let sodium: SodiumPlus;
 
 /**
  * @class AsymmetricSecretKey
  * @package dholecrypto.key
  */
-module.exports = class AsymmetricSecretKey extends Ed25519SecretKey
+export default class AsymmetricSecretKey extends Ed25519SecretKey
 {
-    constructor(stringOrBuffer) {
+    pk: AsymmetricPublicKey;
+    buffer!: Buffer;
+    birationalSecret!: X25519SecretKey;
+    
+    constructor(stringOrBuffer: string | Buffer, _apk?: AsymmetricPublicKey) {
         super(Util.stringToBuffer(stringOrBuffer));
         if (arguments.length > 1) {
             if (arguments[1] instanceof AsymmetricPublicKey) {
                 this.pk = arguments[1];
-            } else if (typeof arguments[1] === 'null' || arguments[1] === null) {
+            } else if (arguments[1] === null) {
                 this.pk = new AsymmetricPublicKey(this.buffer.slice(32, 64));
             } else {
                 throw new TypeError("Second argument must be an AsymmetricPublicKey");
@@ -29,12 +33,12 @@ module.exports = class AsymmetricSecretKey extends Ed25519SecretKey
     /**
      * @return {AsymmetricSecretKey}
      */
-    static async generate() {
+    static async generate(): Promise<AsymmetricSecretKey> {
         if (!sodium) sodium = await SodiumPlus.auto();
-        let keypair = await sodium.crypto_sign_keypair();
+        let keypair: CryptographyKey = await sodium.crypto_sign_keypair();
         return new AsymmetricSecretKey(
-            keypair.slice(0, 64),
-            new AsymmetricPublicKey(keypair.slice(64, 96))
+            keypair.getBuffer().slice(0, 64),
+            new AsymmetricPublicKey(keypair.getBuffer().slice(64, 96))
         );
     }
 
@@ -44,7 +48,7 @@ module.exports = class AsymmetricSecretKey extends Ed25519SecretKey
      *
      * @return {Buffer} length = 32
      */
-    async getBirationalSecret() {
+    async getBirationalSecret(): Promise<X25519SecretKey> {
         if (!sodium) sodium = await SodiumPlus.auto();
         if (typeof this.birationalSecret === 'undefined') {
             this.birationalSecret = await sodium.crypto_sign_ed25519_sk_to_curve25519(this);
@@ -55,7 +59,7 @@ module.exports = class AsymmetricSecretKey extends Ed25519SecretKey
     /**
      * @return {AsymmetricPublicKey}
      */
-    getPublicKey() {
+    getPublicKey(): AsymmetricPublicKey {
         return this.pk;
     }
 
@@ -63,7 +67,7 @@ module.exports = class AsymmetricSecretKey extends Ed25519SecretKey
      * @param {Buffer} buf
      * @returns {AsymmetricSecretKey}
      */
-    injectBirationalEquivalent(buf) {
+    injectBirationalEquivalent(buf: Buffer): AsymmetricSecretKey {
         this.birationalSecret = new X25519SecretKey(Util.stringToBuffer(buf));
         return this;
     }

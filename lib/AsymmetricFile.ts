@@ -1,20 +1,20 @@
 "use strict";
 
-const AsymmetricPublicKey = require('./key/AsymmetricPublicKey');
-const AsymmetricSecretKey = require('./key/AsymmetricSecretKey');
-const base64url = require('rfc4648').base64url;
-const SymmetricFile = require('./SymmetricFile');
-const Util = require('./Util');
-const { SodiumPlus } = require('sodium-plus');
-let sodium;
+import AsymmetricPublicKey from './key/AsymmetricPublicKey';
+import AsymmetricSecretKey from './key/AsymmetricSecretKey';
+import { base64url } from 'rfc4648';
+import SymmetricFile from './SymmetricFile';
+import Util from './Util';
+import { Ed25519SecretKey, Ed25519PublicKey, SodiumPlus } from 'sodium-plus';
+let sodium: SodiumPlus;
 
-module.exports = class AsymmetricFile {
+export default class AsymmetricFile {
     /**
      * @param {string|FileHandle} file
      * @param {AsymmetricSecretKey} secretKey
      * @returns {Promise<string>}
      */
-    static async sign(file, secretKey) {
+    static async sign(file: any, secretKey: Ed25519SecretKey): Promise<string> {
         if (!sodium) sodium = await SodiumPlus.auto();
         if (!(secretKey instanceof AsymmetricSecretKey)) {
             throw new TypeError("Argument 2 must be an instance of AsymmetricSecretKey.");
@@ -36,7 +36,7 @@ module.exports = class AsymmetricFile {
      * @param {string|Buffer} signature
      * @return {boolean}
      */
-    static async verify(file, pk, signature) {
+    static async verify(file: any, pk: Ed25519PublicKey, signature: string): Promise<boolean> {
         if (!sodium) sodium = await SodiumPlus.auto();
         if (!(pk instanceof AsymmetricPublicKey)) {
             throw new TypeError("Argument 2 must be an instance of AsymmetricPublicKey.");

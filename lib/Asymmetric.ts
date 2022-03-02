@@ -1,20 +1,20 @@
 "use strict";
 
-const base64url = require('rfc4648').base64url;
-const { SodiumPlus, Ed25519SecretKey, X25519PublicKey} = require('sodium-plus');
-const Util = require('./Util');
-const CryptoError = require('./error/CryptoError');
-const AsymmetricPublicKey = require('./key/AsymmetricPublicKey');
-const AsymmetricSecretKey = require('./key/AsymmetricSecretKey');
-const SymmetricKey = require('./key/SymmetricKey');
-const Symmetric = require('./Symmetric');
+import { base64url } from 'rfc4648';
+import { SodiumPlus, Ed25519SecretKey, X25519PublicKey, X25519SecretKey, Ed25519PublicKey } from 'sodium-plus';
+import Util from './Util';
+import CryptoError from './error/CryptoError';
+import AsymmetricPublicKey from './key/AsymmetricPublicKey';
+import AsymmetricSecretKey from './key/AsymmetricSecretKey';
+import SymmetricKey from './key/SymmetricKey';
+import Symmetric from './Symmetric';
 
-let sodium;
+let sodium: SodiumPlus;
 /**
  * @name Symmetric
  * @package dholecrypto
  */
-module.exports = class Asymmetric {
+export default class Asymmetric {
     /**
      *
      * @param {AsymmetricSecretKey} sk
@@ -22,7 +22,7 @@ module.exports = class Asymmetric {
      * @param {boolean} isClient
      * @return {SymmetricKey}
      */
-    static async keyExchange(sk, pk, isClient) {
+    static async keyExchange(sk: AsymmetricSecretKey, pk: AsymmetricPublicKey, isClient: boolean): Promise<SymmetricKey> {
         if (!sodium) sodium = await SodiumPlus.auto();
         if (!(sk instanceof AsymmetricSecretKey)) {
             throw new TypeError("Argument 0 must be an instance of AsymmetricSecretKey.");
@@ -64,7 +64,7 @@ module.exports = class Asymmetric {
      * @param {AsymmetricSecretKey} sk
      * @return {string}
      */
-    static async encrypt(msg, pk, sk) {
+    static async encrypt(msg: string | Buffer, pk: AsymmetricPublicKey, sk: AsymmetricSecretKey): Promise<string> {
         msg = Util.stringToBuffer(msg);
         if (!(pk instanceof AsymmetricPublicKey)) {
             throw new TypeError("Argument 2 must be an instance of AsymmetricPublicKey.");
@@ -84,7 +84,7 @@ module.exports = class Asymmetric {
      * @param {AsymmetricPublicKey} pk
      * @return {string}
      */
-    static async decrypt (msg, sk, pk) {
+    static async decrypt (msg: string | Buffer, sk: any, pk: any): Promise<string> {
         msg = Util.stringToBuffer(msg);
         if (!(sk instanceof AsymmetricSecretKey)) {
             throw new TypeError("Argument 2 must be an instance of AsymmetricSecretKey.");
@@ -95,10 +95,11 @@ module.exports = class Asymmetric {
         let unsealed = await Asymmetric.unseal(msg, sk);
         let signature = unsealed.slice(0, 128);
         let plaintext = unsealed.slice(128);
-        if (!Asymmetric.verify(plaintext, pk, signature)) {
+        if (!Asymmetric.verify(plaintext, pk, Util.stringToBuffer(signature))) {
             throw new CryptoError("Invalid signature");
         }
-        return plaintext.toString('binary');
+        let buffText = Util.stringToBuffer(plaintext);
+        return buffText.toString('binary');
     }
 
     /**
@@ -106,7 +107,7 @@ module.exports = class Asymmetric {
      * @param {AsymmetricPublicKey} pk
      * @return {string}
      */
-    static async seal(msg, pk) {
+    static async seal(msg: string | Buffer, pk: AsymmetricPublicKey): Promise<string> {
         msg = Util.stringToBuffer(msg);
         if (!(pk instanceof AsymmetricPublicKey)) {
             throw new TypeError("Argument 2 must be an instance of AsymmetricPublicKey.");
@@ -124,7 +125,7 @@ module.exports = class Asymmetric {
      * @param {AsymmetricSecretKey} sk
      * @return {string}
      */
-    static async unseal(msg, sk) {
+    static async unseal(msg: string | Buffer, sk: AsymmetricSecretKey): Promise<string> {
         msg = Util.stringToBuffer(msg);
         if (!(sk instanceof AsymmetricSecretKey)) {
             throw new TypeError("Argument 2 must be an instance of AsymmetricSecretKey.");
@@ -166,7 +167,7 @@ module.exports = class Asymmetric {
      * @param {AsymmetricSecretKey} sk
      * @return {string}
      */
-    static async sign(msg, sk) {
+    static async sign(msg: string | Buffer | Uint8Array, sk: Ed25519SecretKey): Promise<string> {
         if (!sodium) sodium = await SodiumPlus.auto();
         msg = Util.stringToBuffer(msg);
         if (!(sk instanceof AsymmetricSecretKey)) {
@@ -191,7 +192,7 @@ module.exports = class Asymmetric {
      * @param {string|Buffer} signature
      * @return {boolean}
      */
-    static async verify(msg, pk, signature) {
+    static async verify(msg: string | Buffer | Uint8Array, pk: Ed25519PublicKey, signature: Buffer): Promise<boolean> {
         msg = Util.stringToBuffer(msg);
         if (!(pk instanceof AsymmetricPublicKey)) {
             throw new TypeError("Argument 2 must be an instance of AsymmetricPublicKey.");

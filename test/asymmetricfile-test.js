@@ -2,10 +2,10 @@ const assert = require('assert');
 const base32 = require('rfc4648').base32;
 const fs = require('fs');
 const fsp = fs.promises;
-const AsymmetricFile = require('../lib/AsymmetricFile');
-const AsymmetricSecretKey = require('../lib/key/AsymmetricSecretKey');
-const Keyring = require('../lib/Keyring');
-const Util = require('../lib/Util');
+const AsymmetricFile = require('../dist/lib/AsymmetricFile');
+const AsymmetricSecretKey = require('../dist/lib/key/AsymmetricSecretKey');
+const Keyring = require('../dist/lib/Keyring');
+const Util = require('../dist/lib/Util');
 const loadJsonFile = require('load-json-file');
 
 describe('AsymmetricFile', function() {

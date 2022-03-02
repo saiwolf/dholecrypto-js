@@ -1,16 +1,17 @@
 "use strict";
 
-const { SodiumPlus, Ed25519PublicKey, X25519PublicKey } = require('sodium-plus');
-const Util = require('../Util');
-let sodium;
+import { SodiumPlus, Ed25519PublicKey, X25519PublicKey } from 'sodium-plus';
+import Util from '../Util';
+let sodium: SodiumPlus;
 
 /**
  * @class AsymmetricPublicKey
  * @package dholecrypto.key
  */
-module.exports = class AsymmetricPublicKey extends Ed25519PublicKey
+export default class AsymmetricPublicKey extends Ed25519PublicKey
 {
-    constructor(stringOrBuffer) {
+    birationalPublic!: X25519PublicKey;
+    constructor(stringOrBuffer: string | Buffer) {
         super(Util.stringToBuffer(stringOrBuffer));
     }
 
@@ -20,7 +21,7 @@ module.exports = class AsymmetricPublicKey extends Ed25519PublicKey
      *
      * @return {Buffer} length = 32
      */
-    async getBirationalPublic() {
+    async getBirationalPublic(): Promise<X25519PublicKey> {
         if (!sodium) sodium = await SodiumPlus.auto();
         if (typeof this.birationalPublic === 'undefined') {
             this.birationalPublic = await sodium.crypto_sign_ed25519_pk_to_curve25519(this);
@@ -28,7 +29,7 @@ module.exports = class AsymmetricPublicKey extends Ed25519PublicKey
         return this.birationalPublic;
     }
 
-    injectBirationalEquivalent(buf) {
+    injectBirationalEquivalent(buf: Buffer) {
         this.birationalPublic = new X25519PublicKey(Util.stringToBuffer(buf));
         return this;
     }

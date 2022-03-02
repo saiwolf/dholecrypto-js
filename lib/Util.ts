@@ -1,15 +1,15 @@
 "use strict";
 
-const crypto = require('crypto');
-const toBuffer = require('typedarray-to-buffer');
-const { SodiumPlus } = require('sodium-plus');
-let sodium;
+import crypto from 'crypto';
+import toBuffer from 'typedarray-to-buffer';
+import { SodiumPlus } from 'sodium-plus';
+let sodium: SodiumPlus;
 
 /**
  * @class Util
  * @package dholecrypto
  */
-module.exports = class Util
+export default class Util
 {
     /**
      * Generate a sequence of random bytes.
@@ -17,7 +17,7 @@ module.exports = class Util
      * @param {Number} amount
      * @returns {Buffer}
      */
-    static async randomBytes(amount) {
+    static async randomBytes(amount: number): Promise<Buffer> {
         if (!sodium) sodium = await SodiumPlus.auto();
         return sodium.randombytes_buf(amount);
     }
@@ -29,7 +29,7 @@ module.exports = class Util
      * @param {Number} max
      * @returns {Number}
      */
-    static async randomInt(min = 0, max = 65535) {
+    static async randomInt(min: number = 0, max: number = 65535): Promise<number> {
         let i = 0, rval = 0, bits = 0, bytes = 0;
         let range = max - min;
         /* istanbul ignore if */
@@ -81,7 +81,7 @@ module.exports = class Util
      * @param {string|Buffer|Uint8Array} stringOrBuffer
      * @returns Buffer
      */
-    static stringToBuffer(stringOrBuffer) {
+    static stringToBuffer(stringOrBuffer: string | Buffer | Uint8Array): Buffer {
         if (Buffer.isBuffer(stringOrBuffer)) {
             return stringOrBuffer;
         } else if (typeof(stringOrBuffer) === 'string') {
@@ -100,7 +100,7 @@ module.exports = class Util
      * @param {string|Buffer} b
      * @returns {boolean}
      */
-    static hashEquals(a, b) {
+    static hashEquals(a: string | Buffer, b: string | Buffer): boolean {
         if (a.length !== b.length) {
             return false;
         }

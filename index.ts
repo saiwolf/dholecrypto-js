@@ -1,5 +1,5 @@
 'use strict';
-module.exports = {
+export default {
     'Asymmetric': require('./lib/Asymmetric'),
     'AsymmetricFile': require('./lib/AsymmetricFile'),
     'AsymmetricSecretKey': require('./lib/key/AsymmetricSecretKey'),

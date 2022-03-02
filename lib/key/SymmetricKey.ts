@@ -1,17 +1,18 @@
 "use strict";
 
-const CryptoError = require('../error/CryptoError');
-const { SodiumPlus, CryptographyKey } = require('sodium-plus');
-const Util = require('../Util');
-let sodium;
+import CryptoError from '../error/CryptoError';
+import { SodiumPlus, CryptographyKey } from 'sodium-plus';
+import Util from '../Util';
+let sodium: SodiumPlus;
 
 /**
  * @class SymmetricKey
  * @package dholecrypto.key
  */
-module.exports = class SymmetricKey extends CryptographyKey
+export default class SymmetricKey extends CryptographyKey
 {
-    constructor(stringOrBuffer) {
+    buffer!: Buffer;
+    constructor(stringOrBuffer: string | Buffer) {
         super(Util.stringToBuffer(stringOrBuffer));
         if (this.buffer.length !== 32) {
             throw new CryptoError(
@@ -23,7 +24,7 @@ module.exports = class SymmetricKey extends CryptographyKey
     /**
      * @return {SymmetricKey}
      */
-    static async generate() {
+    static async generate(): Promise<SymmetricKey> {
         if (!sodium) sodium = await SodiumPlus.auto();
         return new SymmetricKey(
             await sodium.randombytes_buf(32)

@@ -1,29 +1,30 @@
 "use strict";
 
-const base64url = require('rfc4648').base64url;
-const Util = require('./Util');
-const CryptoError = require('./error/CryptoError');
-const { SodiumPlus, CryptographyKey } = require('sodium-plus');
-const SymmetricKey = require('./key/SymmetricKey');
+import { base64url } from 'rfc4648';
+import stringToBuffer from './Util';
+import CryptoError from './error/CryptoError';
+import { SodiumPlus, CryptographyKey } from 'sodium-plus';
+import SymmetricKey from './key/SymmetricKey';
+import Util from './Util';
 
 const HEADER = "dhole100";
 const ALLOWED_HEADERS = ["dhole100"];
 const DOMAIN_SEPARATION = Buffer.from("DHOLEcrypto-Domain5eparatorConstant");
 
-let sodium;
+let sodium: SodiumPlus;
 
 /**
  * @name Symmetric
  * @package dholecrypto
  */
-module.exports = class Symmetric
+export default class Symmetric
 {
     /**
      * @param {string|Buffer} message
      * @param {SymmetricKey} symKey
      * @returns {string}
      */
-    static async auth(message, symKey) {
+    static async auth(message: string | Buffer, symKey: SymmetricKey): Promise<string> {
         if (!sodium) sodium = await SodiumPlus.auto();
         message = Util.stringToBuffer(message);
         let subkey = await sodium.crypto_generichash(
@@ -43,7 +44,7 @@ module.exports = class Symmetric
      * @param {SymmetricKey} symKey
      * @returns {string}
      */
-    static async encrypt(plaintext, symKey) {
+    static async encrypt(plaintext: string | Buffer, symKey: SymmetricKey): Promise<string> {
         return Symmetric.encryptWithAd(plaintext, symKey, "");
     }
 
@@ -53,7 +54,7 @@ module.exports = class Symmetric
      * @param {SymmetricKey} symKey
      * @returns {string}
      */
-    static async decrypt(ciphertext, symKey) {
+    static async decrypt(ciphertext: string | Buffer, symKey: SymmetricKey): Promise<string> {
         return Symmetric.decryptWithAd(ciphertext, symKey, "");
     }
 
@@ -64,7 +65,7 @@ module.exports = class Symmetric
      * @param {string|Buffer} aad
      * @returns {string}
      */
-    static async encryptWithAd(plaintext, symKey, aad = "") {
+    static async encryptWithAd(plaintext: string | Buffer, symKey: SymmetricKey, aad: string | Buffer = ""): Promise<string> {
         if (!sodium) sodium = await SodiumPlus.auto();
         if (!(symKey instanceof SymmetricKey)) {
             throw new TypeError('Argument 2 must be a SymmetricKey');
@@ -100,7 +101,7 @@ module.exports = class Symmetric
      * @param {string|Buffer} aad
      * @returns {string}
      */
-    static async decryptWithAd(ciphertext, symKey, aad = "") {
+    static async decryptWithAd(ciphertext: string | Buffer, symKey: SymmetricKey, aad: string | Buffer = ""): Promise<string> {
         if (!sodium) sodium = await SodiumPlus.auto();
         if (!(symKey instanceof SymmetricKey)) {
             throw new TypeError('Argument 2 must be a SymmetricKey');
@@ -129,12 +130,18 @@ module.exports = class Symmetric
         }
 
         try {
-            return sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
+            // SodiumPlus method `crypto_aead_xchacha20poly1305_ietf_decrypt` returns
+            // a `Promise<Buffer>`, but the original code here declares a string as the
+            // return type instead.
+            //
+            // So we explicity convert using toString().
+            let result = await sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
                 cipher,
                 nonce,
                 symKey,
                 ad
             );
+            return result.toString();
         } catch (e) {
             /* istanbul ignore next */
             throw new CryptoError("Decryption failed");
@@ -147,10 +154,10 @@ module.exports = class Symmetric
      * @param {SymmetricKey} symKey
      * @returns {boolean}
      */
-    static async verify(message, mac, symKey) {
+    static async verify(message: string | Buffer, mac: string | Buffer, symKey: SymmetricKey): Promise<boolean> {
         if (!sodium) sodium = await SodiumPlus.auto();
-        message = Util.stringToBuffer(message);
-        mac = Buffer.from(mac, 'hex');
+        message = Util.stringToBuffer(message);        
+        mac = Buffer.from(mac as string, 'hex');
         if (mac.length !== sodium.CRYPTO_AUTH_BYTES) {
             throw new CryptoError("MAC is not sufficient in length");
         }
@@ -169,7 +176,7 @@ module.exports = class Symmetric
      * @param {string|Buffer} ciphertext
      * @returns {boolean}
      */
-    static isValidCiphertext(ciphertext) {
+    static isValidCiphertext(ciphertext: string | Buffer): boolean {
         ciphertext = Util.stringToBuffer(ciphertext);
         if (ciphertext.length < 8) {
             return false;

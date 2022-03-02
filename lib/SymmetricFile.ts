@@ -1,27 +1,28 @@
 "use strict";
 
-const fs = require('fs');
-const fsp = fs.promises;
-const Util = require('./Util');
-const { SodiumPlus } = require('sodium-plus');
-let sodium;
+import { promises } from 'fs';
+const fsp = promises;
+import Util from './Util';
+import { SodiumPlus } from 'sodium-plus';
+import { FileHandle } from 'fs/promises';
+let sodium: SodiumPlus;
 
 const BUFFER_SIZE = 8192;
 
-module.exports = class SymmetricFile {
+export default class SymmetricFile {
     /**
      * @param {string|FileHandle} file
      * @param {string|Buffer} preamble
      * @returns {Promise<Buffer>}
      */
-    static async hash(file, preamble = '') {
+    static async hash(file: string | FileHandle, preamble: string | Buffer = ''): Promise<Buffer> {
         if (!sodium) sodium = await SodiumPlus.auto();
         if (typeof (file) === 'string') {
             let handle = await fsp.open(file, 'r');
             try {
                 return await SymmetricFile.hashFileHandle(
                     handle,
-                    preamble
+                    preamble.toString()
                 );
             } finally {
                 handle.close();
@@ -31,7 +32,7 @@ module.exports = class SymmetricFile {
         if (typeof(file) === 'number') {
             throw new TypeError('File must be a file handle or a path');
         }
-        return await SymmetricFile.hashFileHandle(file, preamble);
+        return await SymmetricFile.hashFileHandle(file, preamble.toString());
     }
 
     /**
@@ -40,7 +41,7 @@ module.exports = class SymmetricFile {
      * @param {string|Buffer} preamble
      * @returns {Promise<Buffer>}
      */
-    static async hashFileHandle(fh, preamble = '') {
+    static async hashFileHandle(fh: FileHandle, preamble: string | Buffer = ''): Promise<Buffer> {
         if (!sodium) sodium = await SodiumPlus.auto();
         let stat = await fh.stat();
         let buf = Buffer.alloc(BUFFER_SIZE);

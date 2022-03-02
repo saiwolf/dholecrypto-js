@@ -6,8 +6,8 @@ const fs = require('fs');
 const fsp = fs.promises;
 const hex = require('rfc4648').base16;
 const loadJsonFile = require('load-json-file');
-const SymmetricFile = require('../lib/SymmetricFile');
-const Util = require('../lib/Util');
+const SymmetricFile = require('../dist/lib/SymmetricFile');
+const Util = require('../dist/lib/Util');
 const { SodiumPlus } = require('sodium-plus');
 let sodium;
 
