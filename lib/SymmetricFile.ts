@@ -22,7 +22,7 @@ export default class SymmetricFile {
             try {
                 return await SymmetricFile.hashFileHandle(
                     handle,
-                    preamble.toString()
+                    preamble
                 );
             } finally {
                 handle.close();
@@ -32,7 +32,7 @@ export default class SymmetricFile {
         if (typeof(file) === 'number') {
             throw new TypeError('File must be a file handle or a path');
         }
-        return await SymmetricFile.hashFileHandle(file, preamble.toString());
+        return await SymmetricFile.hashFileHandle(file, preamble);
     }
 
     /**

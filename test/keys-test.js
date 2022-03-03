@@ -1,7 +1,7 @@
 const assert = require('assert');
 const expect = require('chai').expect;
-const AsymmetricSecretKey = require('../dist/lib/key/AsymmetricSecretKey');
-const AsymmetricPublicKey = require('../dist/lib/key/AsymmetricPublicKey');
+const AsymmetricSecretKey = require('../dist/lib/key/AsymmetricSecretKey').default;
+const AsymmetricPublicKey = require('../dist/lib/key/AsymmetricPublicKey').default;
 const SymmetricKey = require('../dist/lib/key/SymmetricKey').default;
 
 describe('Keys', function() {

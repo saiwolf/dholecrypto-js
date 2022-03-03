@@ -1,9 +1,9 @@
 const assert = require('assert');
 const expect = require('chai').expect;
-const AsymmetricSecretKey = require('../dist/lib/key/AsymmetricSecretKey');
-const AsymmetricPublicKey = require('../dist/lib/key/AsymmetricPublicKey');
+const AsymmetricSecretKey = require('../dist/lib/key/AsymmetricSecretKey').default;
+const AsymmetricPublicKey = require('../dist/lib/key/AsymmetricPublicKey').default;
 const SymmetricKey = require('../dist/lib/key/SymmetricKey').default;
-const Keyring = require('../dist/lib/Keyring');
+const Keyring = require('../dist/lib/Keyring').default;
 const loadJsonFile = require('load-json-file');
 const { SodiumPlus, CryptographyKey } = require('sodium-plus');
 let sodium;
