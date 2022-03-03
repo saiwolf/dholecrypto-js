@@ -1,6 +1,4 @@
-"use strict";
-
-const base64url = require('rfc4648').base64url;
+import { base64url } from 'rfc4648';
 import AsymmetricPublicKey from './key/AsymmetricPublicKey';
 import AsymmetricSecretKey from './key/AsymmetricSecretKey';
 import CryptoError from './error/CryptoError';

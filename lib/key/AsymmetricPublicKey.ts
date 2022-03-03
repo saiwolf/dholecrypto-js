@@ -1,5 +1,3 @@
-"use strict";
-
 import { SodiumPlus, Ed25519PublicKey, X25519PublicKey } from 'sodium-plus';
 import Util from '../Util';
 let sodium: SodiumPlus;

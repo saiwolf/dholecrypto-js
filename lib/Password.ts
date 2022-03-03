@@ -1,13 +1,16 @@
-"use strict";
-
-const base64url = require('rfc4648').base64url;
-import Util from './Util';
-import CryptoError from './error/CryptoError';
 const SymmetricKey = require('./key/SymmetricKey').default;
 import Symmetric from './Symmetric';
 import { SodiumPlus } from 'sodium-plus';
 let sodium: SodiumPlus;
 
+/**
+ * Options for SodiumPlus Password Hashing API.
+ * 
+ * @property {string} alg - The algorithm to use.
+ * @property {number} mem - Memory limit in bytes
+ * @property {number} ops - Ops limit. Recommended default is 2.
+ * 
+ */
 export type PasswordOptions = {
     alg: string;
     mem: number;
@@ -16,7 +19,7 @@ export type PasswordOptions = {
 
 const defaultOptions: PasswordOptions = {
     alg: 'argon2id',
-    mem: 1 << 26,
+    mem: 1 << 26, // 67108864 aka 64MiB
     ops: 2,
 }
 

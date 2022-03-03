@@ -1,5 +1,3 @@
-"use strict";
-
 import CryptoError from '../error/CryptoError';
 import { SodiumPlus, CryptographyKey } from 'sodium-plus';
 import Util from '../Util';

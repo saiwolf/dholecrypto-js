@@ -1,5 +1,3 @@
-"use strict";
-
 import { SodiumPlus, Ed25519SecretKey, X25519SecretKey, CryptographyKey } from 'sodium-plus';
 import AsymmetricPublicKey from './AsymmetricPublicKey';
 import Util from '../Util';

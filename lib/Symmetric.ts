@@ -1,9 +1,6 @@
-"use strict";
-
 import { base64url } from 'rfc4648';
-import stringToBuffer from './Util';
 import CryptoError from './error/CryptoError';
-import { SodiumPlus, CryptographyKey } from 'sodium-plus';
+import { CryptographyKey, SodiumPlus } from 'sodium-plus';
 import SymmetricKey from './key/SymmetricKey';
 import Util from './Util';
 

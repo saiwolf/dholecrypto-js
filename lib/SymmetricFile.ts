@@ -1,14 +1,11 @@
-"use strict";
-
 import { promises } from 'fs';
-const fsp = promises;
-import Util from './Util';
-import { SodiumPlus } from 'sodium-plus';
 import { FileHandle } from 'fs/promises';
+import { SodiumPlus } from 'sodium-plus';
+import Util from './Util';
+
 let sodium: SodiumPlus;
-
 const BUFFER_SIZE = 8192;
-
+const fsp = promises;
 export default class SymmetricFile {
     /**
      * @param {string|FileHandle} file

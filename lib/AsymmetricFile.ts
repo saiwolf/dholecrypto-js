@@ -1,5 +1,3 @@
-"use strict";
-
 import AsymmetricPublicKey from './key/AsymmetricPublicKey';
 import AsymmetricSecretKey from './key/AsymmetricSecretKey';
 import { base64url } from 'rfc4648';

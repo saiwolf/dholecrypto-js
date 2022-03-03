@@ -1,5 +1,3 @@
-"use strict";
-
 import { base64url } from 'rfc4648';
 import { SodiumPlus, Ed25519SecretKey, X25519PublicKey, X25519SecretKey, Ed25519PublicKey } from 'sodium-plus';
 import Util from './Util';

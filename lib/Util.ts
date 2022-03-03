@@ -1,8 +1,6 @@
-"use strict";
-
 import crypto from 'crypto';
-import toBuffer from 'typedarray-to-buffer';
 import { SodiumPlus } from 'sodium-plus';
+import toBuffer from 'typedarray-to-buffer';
 let sodium: SodiumPlus;
 
 /**
